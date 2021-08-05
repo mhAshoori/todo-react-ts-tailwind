@@ -1,7 +1,7 @@
 import { Row } from "./Row";
 import { data } from "../todos";
 import { AddTodo } from "./AddTodo";
-import { v4 as uuidv4 } from "uuid"
+import { v4 as uuidv4 } from "uuid";
 import { ChangeEvent, FormEvent, useState } from "react";
 
 type Todo = {
@@ -12,39 +12,36 @@ type Todo = {
 export const Todos = () => {
   const [todos, setTodos] = useState<Todo[]>(data);
   const [task, setTask] = useState("");
+  const todosLength = todos.length;
+  const hasTodos = todos.length > 0;
+  const remainingTodos=todos.filter((todo) =>!todo.isCompleted).length;
 
+  const handleAddtodo = (todo: Todo) => {
+    const updatedTodos = [...todos, todo];
+    setTodos(updatedTodos);
+    setTask("");
+  };
 
-const handleAddtodo=(todo:Todo)=>{
-    const updatedTodos =[...todos, todo]
-    setTodos(updatedTodos)
-    setTask("")
-}
+  const handleChange = (e: ChangeEvent) => {
+    const { value } = e.target as HTMLInputElement;
+    setTask(value);
+  };
 
-const handleChange = (e:ChangeEvent) =>{
-    const {value} = e.target as HTMLInputElement
-    setTask(value)
-}
-
-const handleSubmitTodo =(e:FormEvent) =>{
-    e.preventDefault()
+  const handleSubmitTodo = (e: FormEvent) => {
+    e.preventDefault();
 
     const todo = {
-        id: uuidv4(),
-        task:task,
-        isCompleted:false
-    }
-    task && handleAddtodo(todo)
-}
-
-
+      id: uuidv4(),
+      task: task,
+      isCompleted: false,
+    };
+    task && handleAddtodo(todo);
+  };
 
   const handleDeleteTodo = (id: string) => {
     const updatedTodos = todos.filter((todo) => todo.id !== id);
     setTodos(updatedTodos);
   };
-
-
-
 
   const handleCheckTodo = (id: string) => {
     const updatedTodos = todos.map((todo) => {
@@ -59,12 +56,13 @@ const handleSubmitTodo =(e:FormEvent) =>{
     setTodos(updatedTodos);
   };
   return (
-    <section>
-      <AddTodo 
-      task={task} 
-      handleChange={handleChange}
-      handleSubmitTodo={handleSubmitTodo}
+    <section className="w-10/12  sm:w-10/11 lg:w-1/2 max-w-2xl flex flex-col items-center">
+      <AddTodo
+        task={task}
+        handleChange={handleChange}
+        handleSubmitTodo={handleSubmitTodo}
       />
+      <div className=" h-10"/>
       {todos.map((todo) => (
         <Row
           key={todo.id}
@@ -73,6 +71,11 @@ const handleSubmitTodo =(e:FormEvent) =>{
           handleCheckTodo={handleCheckTodo}
         />
       ))}
+      { !hasTodos && <p className="mb-5  text-xl text-red-500 uppercase">Please Add a task!</p>}
+      { hasTodos &&(
+          <p>{`[${remainingTodos} of ${todosLength}] Tasks Remaining`}</p>
+      )
+      }
     </section>
   );
 };
